@@ -1,0 +1,1 @@
+C:\Users\user\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\Scripts\pyinstaller.exe --name="Computer Systems Monitor" -y --noconsole --onedir watchdog.py
