@@ -1,8 +1,16 @@
+import sys
+try:
+    sys.argv[1]
+except:
+    raise RuntimeError("Arguments Error")
+    sys.exit()
+
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import cv2
 import threading
 from datetime import datetime
+import requests
 
 # loading QReader on a thread so it doesnt stall start time
 qreaderLoaded = False
@@ -14,7 +22,7 @@ def loadQReader():
     print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Imported QReader")
     qreaderLoaded = True
     qrScanButton.configure(state="enabled")
-    qrTipLabel.configure(text="Show your QR Identifier on the laptop camera, then click SCAN!")
+    qrTipLabel.configure(text="Put your QR Identifier in the camera!")
 threading.Thread(target=loadQReader, daemon=True).start()
 
 ctk.set_appearance_mode("light")
@@ -22,10 +30,13 @@ ctk.set_default_color_theme("dark-blue")
 
 screen = ctk.CTk()
 
-#screen.overrideredirect(True)
-#screen.attributes("-topmost", True)
-screen.attributes("-fullscreen", True)
-screen.geometry(f"{screen.winfo_screenwidth()}x{screen.winfo_screenheight()}+0+0")
+try:
+    if sys.argv[2] == "devMode":
+        screen.attributes("-fullscreen", True)
+except:
+    screen.overrideredirect(True)
+    screen.attributes("-topmost", True)
+    screen.geometry(f"{screen.winfo_screenwidth()}x{screen.winfo_screenheight()}+0+0")
 
 
 
@@ -207,7 +218,7 @@ cameraLabel = ctk.CTkLabel(
 
 qrTipLabel = ctk.CTkLabel(
     qrFrame,
-    text="QR Scanner is still loading...",
+    text="Wait for the QR Scanner to load...",
     font=("Segoe UI Variable", 20, "italic")
 )
 
@@ -235,17 +246,23 @@ qrScanButton.place(relx=0.5, rely=0.95, anchor="center")
 webcam = None
 cameraLoaded = False
 lastFrame = None
+isScanning = False
 
 def renderFrames():
     retrieved, cameraFrame = webcam.read()
     global lastFrame
+    global isScanning
     if retrieved:
         lastFrame = cameraFrame.copy()
-        cameraFrame = cv2.cvtColor(cameraFrame, cv2.COLOR_BGR2RGB)
+        cameraFrame = cv2.flip( cv2.cvtColor(cameraFrame, cv2.COLOR_BGR2RGB), 1)
         tkCamera = ImageTk.PhotoImage( Image.fromarray(cameraFrame) )
         cameraLabel.configure(image=tkCamera)
         cameraLabel.image = tkCamera
+        if not isScanning:
+            isScanning = True
+            threading.Thread(target=scanQR, daemon=True).start()
     screen.after(15, renderFrames)
+    
 
 def loadCamera():
     global cameraLoaded
@@ -254,11 +271,11 @@ def loadCamera():
     webcam = cv2.VideoCapture(0)
     if not webcam.isOpened():
         raise RuntimeError("Cannot open webcam")
-    
     cameraLabel.configure(text="")
     renderFrames()
 
 def scanQR():
+    global isScanning
     if lastFrame is None:
         return
     
@@ -268,20 +285,33 @@ def scanQR():
         scanResult = qreader.detect_and_decode( image=cv2.cvtColor(lastFrame, cv2.COLOR_BGR2RGB) )
         
         if scanResult:
-            print(scanResult)
-            submitQR(scanResult)
+            print(scanResult[0])
+            submitQR(str(scanResult[0]))
         else:
             print("no qr code found")
-            qrTipLabel.configure(text="No QR code detected")
+            #qrTipLabel.configure(text="No QR code detected")
+            isScanning = False
     else:
         print("qreader not imported yet")
+        isScanning = False
 
 # submit info
 
+def sendPost(userInfo): 
+    result = requests.post('http://localhost:3000/user/', json = userInfo)
+    try:
+        result.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+    else:
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} >>> user info delivered, code {result.status_code}.")
+
 def submitQR(qrData):
+    global isScanning
     if not qrData.startswith("KC"):
         print("invalid QR, no KC prefix")
-        qrTipLabel.configure(text="This is not a valid ARGUS QR")
+        isScanning = False
+        qrTipLabel.configure(text="Failed to read, put your QR closer")
         return
     
     qrData = qrData[2:] # remove KC
@@ -289,17 +319,21 @@ def submitQR(qrData):
     firstName, lastName = name.split("+") # split between + in the name part
     grade = school[:2] # first 2 chars of school part, "11" or "12"
     section = school[-1] # last char of school part, "1" or "2" or "3"
-    strand = school[2:-2] # middle part between the prev 2
+    strand = school[2:-1] # middle part between the prev 2
     
     userInfo = {
         "firstName": firstName,
         "lastName": lastName,
         "grade": grade,
         "strand": strand,
-        "section": section
+        "section": section,
+        "deviceID": sys.argv[1],
+        "loginTime": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     
     print(userInfo)
+    sendPost(userInfo)
+    
     switchStartFrame(f"Welcome {firstName} {lastName}!")
 
 def submitManual():
@@ -315,9 +349,9 @@ def submitManual():
         manualTipLabel.configure(text="Select your Grade Level!")
         return
     if gradeLevelOptions.get() == "11th Grade":
-        grade = 11
+        grade = '11'
     if gradeLevelOptions.get() == "12th Grade":
-        grade = 12
+        grade = '12'
     
     if strandOptions.get() == "[Strand]":
         manualTipLabel.configure(text="Select your Strand!")
@@ -332,9 +366,12 @@ def submitManual():
         "lastName": lastNameEntry.get().title(),
         "grade": grade,
         "strand": strandOptions.get(),
-        "section": sectionOptions.get()
+        "section": sectionOptions.get(),
+        "laptopID": sys.argv[1],
+        "loginTime": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     print(userInfo)
+    sendPost(userInfo)
     
     switchStartFrame(f"Welcome {firstNameEntry.get().title()} {lastNameEntry.get().title()}!")
 # frame switcher

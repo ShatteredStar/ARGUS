@@ -1,3 +1,7 @@
-dist/
-build/
+loginClient/dist/
+loginClient/build/
 *.spec
+
+server/argus.db
+
+dashboardFrontend/assets/

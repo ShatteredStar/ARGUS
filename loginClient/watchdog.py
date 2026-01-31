@@ -14,20 +14,19 @@ def hearbeat():
         if "SSID" in line and "BSSID" not in line:
             SSID = line.split(':')[1].strip()
     data = {
-        "content" : f"""
-        **Device Name**: {socket.gethostname()}
-        **Battery Percentage**: {psutil.sensors_battery().percent}
-        **Plugged In?**: {psutil.sensors_battery().power_plugged}
-        **WIFI Name**: {SSID}
-        **Boot Time**: {datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")}"""
+        "deviceName": socket.gethostname(),
+        "batteryPercentage": psutil.sensors_battery().percent,
+        "plugged": psutil.sensors_battery().power_plugged,
+        "wifi": SSID,
+        "bootTime": datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S")
     }
-    result = requests.post(webhookUrl, json = data)
+    result = requests.post('http://localhost:3000/device/', json = data)
     try:
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
         print(err)
     else:
-        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} >>> Payload delivered successfully, code {result.status_code}.")
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} >>> device info delivered, code {result.status_code}.")
 
 
 
@@ -45,7 +44,7 @@ while True:
             print("lock is alive, won't run lock")
     
     if lockAlive == False:
-        subprocess.Popen([lockPath], creationflags=subprocess.DETACHED_PROCESS, close_fds=True)
+        #subprocess.Popen([lockPath], creationflags=subprocess.DETACHED_PROCESS, close_fds=True)
         print("cant find lock, created new instance")
     
     hearbeat()
