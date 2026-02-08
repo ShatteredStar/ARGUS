@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" data-theme="white">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+		<link rel="stylesheet" href="/styles/pico.blue.css">
+		<link rel="stylesheet" href="/styles/dashboard.css">
+		
+		
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ARGUS - Dashboard</title>
+	</head>
+	
+	<body>
+		
+		<div class="container">
+			
+		</div>
+		
+		<div class="container-fluid navSearch">
+			<img class="logo" src="/assets/logo.svg">
+			<fieldset role="group">
+				<input type="search" autocomplete="off" id="cardsSearch"placeholder="Search laptops, battery percentages, or users...">
+				<details class="dropdown" id="sortDropdown">
+					<summary >Sort By: <i>Most Recent</i></summary>
+					<ul>
+						<li><a href="#">Laptop Number</a></li>
+						<li><a href="#">Lowest Battery%</a></li>
+					</ul>
+				</details>
+			</fieldset>
+		</div>
+		
+		<div id="laptopCards" class="container" data-theme="dark">
+		</div>
+		
+		<dialog id="deviceInfoModal">
+			<article>
+				<header>
+					<button aria-label="Close" rel="prev"></button>
+					<h3 id="modalHeader">LAPTOP 111</h3>
+				</header>
+				<table>
+					<tbody>
+						<tr>
+							<th scope="row"> <img src="/assets/icons/user.svg" height=20> <span id="modalUserName"></span></th>
+							<td id="modalUser"></td>
+						</tr>
+						<tr>
+							<th scope="row"> <img id="modalBatteryIcon" height=20> Battery Percentage</th>
+							<td id="modalBattery"></td>
+						</tr>
+						<tr>
+							<th scope="row"><img id="modalTimeIcon"> <span id="modalTimeName"></span></th>
+							<td id="modalTime"></td>
+						</tr>
+						<tr>
+							<th scope="row"> <img src="/assets/icons/wifi.svg"> Wi-Fi Connection:</th>
+							<td id="modalWifi"></td>
+						</tr>
+					</tbody>
+				</table>
+				
+				<details id="modalUserHistory">
+					<summary role="button" class="contrast">User History</summary>
+					<input type="search" autocomplete="off" id="tableSearch" placeholder="Search names, sections, or dates...">
+					<table class="table-sort table-arrows">
+						<thead>
+							<tr>
+								<th scope="col">Login</th>
+								<th scope="col">First Name</th>
+								<th scope="col">Surname</th>
+								<th scope="col">Section</th>
+							</tr>
+						</thead>
+						<tbody id="userHistoryInfo">
+						</tbody>
+					</table>
+				</details>
+			</article>
+		</dialog>
+		
+	</body>
+	
+	<script>
+		window.dashboardDataRecent = JSON.parse(`<%- dashboardData %>`);
+		window.userHistoryData = JSON.parse(`<%- userHistoryData %>`);
+		console.log(window.dashboardDataRecent);
+		console.log(window.userHistoryData);
+	</script>
+	
+	
+<script src="/js/dashboard.js"></script>

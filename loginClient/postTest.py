@@ -1,21 +1,11 @@
-import os
-from datetime import datetime
-import time
-import socket
 import requests
 import psutil
 import subprocess
+from datetime import datetime
+import time
 import sys
 
-try:
-    sys.argv[1]
-except:
-    raise RuntimeError("Arguments Error")
-    sys.exit()
-
-webhookUrl = "https://discord.com/api/webhooks/1409471156397936693/HzK-5KZLHP1kXHaC5zO2gKg_Nyu2rJnnm_TyyoW8AbyVVtlrQDEOtS1t68k_KcvlPT9H"
-
-def hearbeat():
+def devicePost():
     SSID = None
     for line in subprocess.check_output(['netsh', 'wlan', 'show', 'interfaces']).decode('utf-8').strip().split('\n'):
         if "SSID" in line and "BSSID" not in line:
@@ -36,26 +26,29 @@ def hearbeat():
         print(err)
     else:
         print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} >>> device info delivered, code {result.status_code}.")
+        
+def userPost(userInfo):
+    result = requests.post('http://localhost:3000/api/user/', json = userInfo)
+    try:
+        result.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        print(err)
+    else:
+        print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} >>> user info delivered, code {result.status_code}.")
 
 
+userInfo = {
+    "firstName": sys.argv[2],
+    "lastName": sys.argv[3],
+    "grade": "12",
+    "strand": "STEM",
+    "section": "1",
+    "deviceID": sys.argv[1],
+    "loginTime": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-lockPath = r"C:\Users\user\Documents\Projects\ARGUS\loginClient\dist\ArgusLock\ArgusLock.exe"
+}
 
+userPost(userInfo)
 while True:
-    lockAlive = False
-    
-    for i in psutil.process_iter(['name']):
-        if i.info['name'] == 'ArgusLock.exe':
-            lockAlive = True
-            print("lock is alive, won't run lock")
-    
-    if lockAlive == False:
-        try:
-            if sys.argv[2] == 'devMode':
-                print('devmode active, wont run Lock')
-        except:
-            subprocess.Popen([lockPath, sys.argv[1]], creationflags=subprocess.DETACHED_PROCESS, close_fds=True)
-            print("cant find lock, created new instance")
-    
-    hearbeat()
+    devicePost()
     time.sleep(1)

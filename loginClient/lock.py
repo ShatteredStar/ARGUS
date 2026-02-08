@@ -292,13 +292,13 @@ def scanQR():
             #qrTipLabel.configure(text="No QR code detected")
             isScanning = False
     else:
-        print("qreader not imported yet")
+        #print("qreader not imported yet")
         isScanning = False
 
 # submit info
 
 def sendPost(userInfo): 
-    result = requests.post('http://localhost:3000/user/', json = userInfo)
+    result = requests.post('http://localhost:3000/api/user/', json = userInfo)
     try:
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
@@ -367,7 +367,7 @@ def submitManual():
         "grade": grade,
         "strand": strandOptions.get(),
         "section": sectionOptions.get(),
-        "laptopID": sys.argv[1],
+        "deviceID": sys.argv[1],
         "loginTime": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     print(userInfo)

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en" data-theme="white">
+<head>
+	<meta charset="UTF-8" />
+	<link rel="icon" type="image/svg+xml" href="/assets/icon.svg" />
+	<link rel="stylesheet" href="/styles/pico.blue.css">
+	<link rel="stylesheet" href="/styles/dashboard.css">
+
+
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>ARGUS - Laptops</title>
+</head>
+
+<body>
+
+<nav>
+	<ul class="name">
+		<li><img src="/assets/iconCropped.svg" width=100></li>
+	</ul>
+	</ul>
+	<ul class="links">
+		<span class="landscapeOnly">
+			<li><a href="../dashboard">Dashboard</a></li>
+			<li>Laptops</li>
+			<li><a href="#">Users</a></li>
+		</span>
+		<details class="dropdown portraitOnly">
+			<summary>Laptops</summary>
+			<ul>
+				<li><a href="../dashboard">Dashboard</a></li>
+				<li><a href="#">Users</a></li>
+			</ul>
+		</details>
+	</ul>
+</nav>
+
+<div id="laptopList" class="container" data-theme="dark">
+
+<details class="container">
+	<summary role="button" class="contrast">Owls</summary>
+	<p>...</p>
+</details>
+
+</div>
+
+</body>
+
+<script>
+window.dashboardData = `<%- laptops %>`;
+console.log(window.dashboardData);
+</script>
+
+</script>

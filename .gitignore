@@ -2,6 +2,6 @@ loginClient/dist/
 loginClient/build/
 *.spec
 
-server/argus.db
+webserver/argus.db
 
-dashboardFrontend/assets/
+webServer/public/assets/

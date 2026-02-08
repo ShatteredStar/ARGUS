@@ -1,0 +1,141 @@
+@media (orientation: landscape) {
+	.portraitOnly {
+		display: none !important;
+	}
+}
+
+@media (orientation: portrait) {
+	.landscapeOnly {
+		display: none !important;
+	}
+}
+
+.hide{
+	display: none !important;
+}
+
+.truncate {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: 100%; 
+}
+
+html {
+	background-image: url("../assets/bgBlurDark.png");
+	background-attachment: fixed;
+	background-size: cover;
+	background-repeat: no-repeat;
+	overflow-y: overlay;
+} 
+
+nav {
+	background-color: #eddfe0;
+	border-radius: 10px;
+	margin-right: 0.8rem;
+	margin-left: 0.8rem;
+	margin-top: 0.3rem;
+}
+
+.navTitle{
+	font-size: 1.5rem;
+	font-style: italic;
+}
+
+nav ul.links {
+	margin-right: 0.5rem;
+}
+
+nav ul.name {
+	margin-left: 0.5rem;
+}
+
+button.laptopCard{
+	text-align: left;
+	/*color: black;*/
+}
+
+button.laptopCard.active {
+	border-color: #62D926;
+	border-width: 8px;
+}
+
+button.laptopCard.inactive {
+	border-color: #b7b7b7;
+	border-width: 5px;
+}
+
+span.laptopCardTitle{
+	text-align: center;
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
+.grid {
+	margin-bottom: 1rem;
+	margin-top: 1rem;
+}
+
+#deviceInfoModal > article {
+	width: 60%;
+	max-width: 1200px;
+}
+
+#tableSearch {
+	width: 90%;
+	display: block;
+	margin: 0 auto;
+}
+
+.logo {
+	width: 15%;
+}
+
+.batteryWarningIcon{
+	height: 1.8rem;
+}
+
+/*too lazy to write ts myself, thank gemini*/
+
+/* Target the dropdown inside your group */
+[role="group"] details.dropdown {
+    width: auto;
+    white-space: nowrap; /* Prevents text and arrow from splitting */
+    margin-bottom: 0;
+}
+
+[role="group"] details.dropdown summary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem; /* Space between text and arrow */
+    height: 100%; /* Match height of search input */
+}
+
+/* Fixes the arrow positioning specifically for Pico */
+[role="group"] details.dropdown summary::after {
+    margin-top: 0; 
+    position: static; /* Stops the arrow from floating to a new line */
+}
+
+/* 1. Define the width of the scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px; /* For horizontal scrollbars */
+}
+
+/* 2. Keep the track (background) transparent */
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* 3. Style the "nub" (the thumb) */
+::-webkit-scrollbar-thumb {
+    background: rgba(136, 136, 136, 0.4); /* Subtle grey with transparency */
+    border-radius: 10px; /* Makes it look like a pill/nub */
+}
+
+/* 4. Optional: Make the nub darker when hovered */
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(136, 136, 136, 0.8);
+}
