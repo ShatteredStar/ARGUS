@@ -32,19 +32,24 @@ async function dashboardDataUpdate(){
 		const responseJson = await response.json();
 		window.dashboardDataRecent = responseJson.dashboardData;
 		sortDashboardData();
+		console.log('request sent')
 		
-		if (selectedSort === 'Most Recent'){
-			renderCards(dashboardDataRecent);
-		} else if (selectedSort === "Lowest Battery%"){
-			renderCards(dashboardDataBattery);
-		} else if (selectedSort === "Laptop Number"){
-			renderCards(dashboardDataLaptop);
+		if (document.getElementById("cardsSearch").value === ''){
+			if (selectedSort === 'Most Recent'){
+				renderCards(dashboardDataRecent);
+			} else if (selectedSort === "Lowest Battery%"){
+				renderCards(dashboardDataBattery);
+			} else if (selectedSort === "Laptop Number"){
+				renderCards(dashboardDataLaptop);
+			}
+		} else {
+			console.log('canceled dashboard update, searchbar has content');
 		};
 	} catch (error) {
 		console.error(`Dashboard Fetch Error: ${error}`)
 	};
 };
-setInterval(dashboardDataUpdate, 10000);
+setInterval(dashboardDataUpdate, 3000);
 
 function batteryIcon(percent){
 	let icon = '';

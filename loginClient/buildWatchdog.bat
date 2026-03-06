@@ -1,6 +1,6 @@
-pyinstaller ^
---name="Computer Systems Monitor" ^
+python -m PyInstaller ^
+--name="CSM" ^
 -y ^
---noconsole ^
 --onedir ^
+--noconsole ^
 watchdog.py

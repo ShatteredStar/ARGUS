@@ -1,11 +1,14 @@
 import os
 from datetime import datetime
 import time
-import socket
 import requests
 import psutil
 import subprocess
 import sys
+
+# sys.argv[1] is the http request destination
+# sys.argv[2] is the device id
+# sys.argv[3] is devMode activation
 
 try:
     sys.argv[1]
@@ -13,23 +16,35 @@ except:
     raise RuntimeError("Arguments Error")
     sys.exit()
 
-webhookUrl = "https://discord.com/api/webhooks/1409471156397936693/HzK-5KZLHP1kXHaC5zO2gKg_Nyu2rJnnm_TyyoW8AbyVVtlrQDEOtS1t68k_KcvlPT9H"
+def getWifi():
+    try:
+        # Run the command
+        output = subprocess.check_output(
+            ['netsh', 'wlan', 'show', 'interfaces'],
+            creationflags=subprocess.CREATE_NO_WINDOW,
+            stderr=subprocess.STDOUT # Capture error messages too
+        ).decode('utf-8')
+        
+        for line in output.strip().split('\n'):
+            if "SSID" in line and "BSSID" not in line:
+                return line.split(':')[1].strip()
+        
+        return "Not connected through Wi-Fi" # No SSID found even if command worked
+        
+    except subprocess.CalledProcessError:
+        # This happens if Wi-Fi is off or still connecting
+        return "Wi-Fi is off"
 
-def hearbeat():
-    SSID = None
-    for line in subprocess.check_output(['netsh', 'wlan', 'show', 'interfaces']).decode('utf-8').strip().split('\n'):
-        if "SSID" in line and "BSSID" not in line:
-            SSID = line.split(':')[1].strip()
+def heartbeat():
     data = {
-        # "deviceName": socket.gethostname(),
-        "deviceName": sys.argv[1],
+        "deviceName": sys.argv[2],
         "batteryPercentage": psutil.sensors_battery().percent,
         "plugged": psutil.sensors_battery().power_plugged,
-        "wifi": SSID,
+        "wifi": str(getWifi()),
         "bootTime": datetime.fromtimestamp(psutil.boot_time()).strftime("%Y-%m-%d %H:%M:%S"),
         "lastPing": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
-    result = requests.post('http://localhost:3000/api/device/', json = data)
+    result = requests.post(f"{sys.argv[1]}/api/device", json = data)
     try:
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
@@ -39,23 +54,35 @@ def hearbeat():
 
 
 
-lockPath = r"C:\Users\user\Documents\Projects\ARGUS\loginClient\dist\ArgusLock\ArgusLock.exe"
+
+#lockPath = r"C:\Users\user\Documents\Projects\ARGUS\loginClient\dist\ArgusLock\ArgusLock.exe"
+#flags = subprocess.DETACHED_PROCESS | subprocess.CREATE_NO_WINDOW
+lockPath = os.path.join(os.getcwd(), "lock", "ArgusLock.exe")
+print(lockPath)
 
 while True:
-    lockAlive = False
+    # lockAlive = False
     
-    for i in psutil.process_iter(['name']):
-        if i.info['name'] == 'ArgusLock.exe':
-            lockAlive = True
-            print("lock is alive, won't run lock")
-    
-    if lockAlive == False:
-        try:
-            if sys.argv[2] == 'devMode':
-                print('devmode active, wont run Lock')
-        except:
-            subprocess.Popen([lockPath, sys.argv[1]], creationflags=subprocess.DETACHED_PROCESS, close_fds=True)
-            print("cant find lock, created new instance")
-    
-    hearbeat()
+    # try:
+        # if len(sys.argv) > 3 and sys.argv[3] == 'devMode':
+            # print('devmode active, wont run Lock')
+            # lockAlive = True
+    # except IndexError:
+        # pass
+    # # if devmode not active, check if lock is alive
+    # if not lockAlive:
+        # for i in psutil.process_iter(['name']):
+            # if i.info['name'] == 'ArgusLock.exe':
+                # lockAlive = True
+                # print("lock is alive, won't run lock")
+                # break # Exit the for-loop immediately
+        # if not lockAlive:
+            # subprocess.Popen(
+                # [lockPath, sys.argv[1], sys.argv[2]], 
+                # #creationflags=flags,
+                # #shell=True,
+                # close_fds=True
+            # )
+            # print("cant find lock, created new instance")
+    heartbeat()
     time.sleep(1)

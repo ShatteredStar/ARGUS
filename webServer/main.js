@@ -116,7 +116,7 @@ function getDashboard(){
 			rows.forEach(row => {
 				const lastPingDate = new Date(row.lastPing.replace(' ', 'T'));
 				const now = new Date();
-				const isActive = (now -lastPingDate) < (1*(60*1000));
+				const isActive = (now -lastPingDate) < (1*(10*1000)); //10 second delay before being marked inactive
 				
 				dashboardData.push({
 					deviceID: row.deviceID,
@@ -173,6 +173,6 @@ argus.get('/dashboard', async (req, res) => {
 	});
 });
 
-argus.listen(port, () => {
-	console.log(`ARGUS listening on port ${port}`)
-});
+//argus.listen(port, () => {console.log(`ARGUS listening on port ${port}`)});
+
+argus.listen(3000, '0.0.0.0', () => {console.log("Server is live on the local network!")});

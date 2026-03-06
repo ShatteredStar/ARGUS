@@ -5,12 +5,15 @@ except:
     raise RuntimeError("Arguments Error")
     sys.exit()
 
+import gc
 import customtkinter as ctk
 from PIL import Image, ImageTk
 import cv2
 import threading
 from datetime import datetime
 import requests
+import time
+import os
 
 # loading QReader on a thread so it doesnt stall start time
 qreaderLoaded = False
@@ -31,12 +34,21 @@ ctk.set_default_color_theme("dark-blue")
 screen = ctk.CTk()
 
 try:
-    if sys.argv[2] == "devMode":
-        screen.attributes("-fullscreen", True)
+    if sys.argv[3] == "devMode":
+        #screen.attributes("-fullscreen", True)
+        pass
+    else:
+        screen.overrideredirect(True)
+        screen.attributes("-topmost", True)
+        screen.geometry(f"{screen.winfo_screenwidth()}x{screen.winfo_screenheight()}+0+0")
 except:
     screen.overrideredirect(True)
     screen.attributes("-topmost", True)
     screen.geometry(f"{screen.winfo_screenwidth()}x{screen.winfo_screenheight()}+0+0")
+
+# screen.overrideredirect(True)
+# screen.attributes("-topmost", True)
+# screen.geometry(f"{screen.winfo_screenwidth()}x{screen.winfo_screenheight()}+0+0")
 
 
 
@@ -45,7 +57,25 @@ except:
 # initial frame
 loginFrame = ctk.CTkFrame(screen, fg_color="transparent")
 
-argusLogo = ctk.CTkImage( light_image=Image.open("assets/argus.png"), size=(478.1,203.35) )
+# 1. Get the absolute path to the directory where the script/exe lives
+if getattr(sys, 'frozen', False):
+    # If the app is compiled (e.g., with PyInstaller)
+    basedir = os.path.dirname(sys.executable)
+else:
+    # If the app is running as a normal Python script
+    basedir = os.path.dirname(os.path.abspath(__file__))
+
+# 2. Join that base path with your assets folder
+logo_path = os.path.join(basedir, "assets", "argus.png")
+
+# 3. Use the absolute path in your CTK code
+argusLogo = ctk.CTkImage(
+    light_image=Image.open(logo_path), 
+    size=(478.1, 203.35)
+)
+
+# yes, the above is ai. no, i dont care anymore
+
 logoLabel = ctk.CTkLabel( loginFrame, text="", image=argusLogo )
 
 welcomeLabel = ctk.CTkLabel(
@@ -89,8 +119,8 @@ manualButton = ctk.CTkButton(
 
 logoLabel.place(anchor="center", relx=0.5, rely=0.2)
 welcomeLabel.place(anchor="center", relx=0.5, rely=0.40)
-scanButton.place(anchor="center", relx=0.5, rely=0.63)
-manualButton.place(anchor="center", relx=0.5, rely=0.80)
+scanButton.place(anchor="center", relx=0.5, rely=0.7)
+# manualButton.place(anchor="center", relx=0.5, rely=0.80)
 loginFrame.place(relx=0, rely=0, relwidth=1, relheight=1)
 
 # manual frame
@@ -247,8 +277,11 @@ webcam = None
 cameraLoaded = False
 lastFrame = None
 isScanning = False
+isZombie = False
 
 def renderFrames():
+    if isZombie:
+        return
     retrieved, cameraFrame = webcam.read()
     global lastFrame
     global isScanning
@@ -298,7 +331,7 @@ def scanQR():
 # submit info
 
 def sendPost(userInfo): 
-    result = requests.post('http://localhost:3000/api/user/', json = userInfo)
+    result = requests.post(f"{sys.argv[1]}/api/user", json = userInfo)
     try:
         result.raise_for_status()
     except requests.exceptions.HTTPError as err:
@@ -327,7 +360,7 @@ def submitQR(qrData):
         "grade": grade,
         "strand": strand,
         "section": section,
-        "deviceID": sys.argv[1],
+        "deviceID": sys.argv[2],
         "loginTime": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     
@@ -367,7 +400,7 @@ def submitManual():
         "grade": grade,
         "strand": strandOptions.get(),
         "section": sectionOptions.get(),
-        "deviceID": sys.argv[1],
+        "deviceID": sys.argv[2],
         "loginTime": datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     }
     print(userInfo)
@@ -410,5 +443,11 @@ loginFrame.tkraise()
 print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} Started App")
 screen.mainloop()
 
-webcam.release()
+if webcam is not None:
+    webcam.release()
+    webcam = None
+isScanning = False
+gc.collect()
 
+while True:
+    time.sleep((60*60))
