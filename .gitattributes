@@ -1,2 +1,6 @@
-webServer/public/styles/pico.blue.css linguist-vendored
-webServer/public/js/table-sort.js linguist-vendored
+webServer/public/styles/deps/pico.blue.css linguist-vendored
+webServer/public/styles/deps/pico.slate.css linguist-vendored
+
+webServer/public/js/deps/table-sort.js linguist-vendored
+webServer/public/js/deps/chart.js linguist-vendored
+webServer/public/js/deps/qr-code-styling.js linguist-vendored

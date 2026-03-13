@@ -165,7 +165,12 @@ argus.get('/api/dashboard-update', async (req, res) => {
 	res.json(data);
 });
 
-argus.get('/dashboard', async (req, res) => {
+argus.get('/create-qr', async (req, res) => {
+	console.log('qr ping');
+	res.render('qr', {});
+});
+
+argus.get('/', async (req, res) => {
 	console.log('dashboard ping');
 	res.render('dashboard', {
 		dashboardData: JSON.stringify(await getDashboard()),

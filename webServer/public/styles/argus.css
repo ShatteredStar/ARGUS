@@ -1,0 +1,68 @@
+@media (orientation: landscape) {
+	.portraitOnly {
+		display: none !important;
+	}
+}
+
+@media (orientation: portrait) {
+	.landscapeOnly {
+		display: none !important;
+	}
+}
+
+.risingButton {
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.risingButton:hover {
+	transform: translateY(-0.5rem); /* Lifts the button */
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Adds depth */
+}
+
+/* From Uiverse.io by virus231 */ 
+.highlightButton {
+	/* background: #01274b; */
+	background: #EFF1F4;
+	border-radius: 5rem;
+	border: 2px solid transparent;
+
+	/* text-shadow: 1px 1px 1px #00000040; */
+	/* box-shadow: 8px 8px 20px 0px #45090059; */
+
+	padding: 10px 40px;
+	line-height: 20px;
+	cursor: pointer;
+	transition: all 0.3s;
+	color: black;
+	font-weight: 500;
+}
+
+.highlightButton:hover {
+	box-shadow: none;
+	opacity: 80%;
+}
+
+.hide{
+	display: none !important;
+}
+
+
+.truncate {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	width: 100%; 
+}
+
+html {
+	background-image: url("../assets/bgBlurDark.png");
+	background-attachment: fixed;
+	background-size: cover;
+	background-repeat: no-repeat;
+	overflow-y: overlay;
+}
+
+.logo {
+	width: 15%;
+	
+}

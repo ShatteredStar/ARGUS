@@ -5,19 +5,19 @@ function sortDashboardData () {
 	dashboardDataBattery = [...window.dashboardDataRecent].sort(function(a, b){
 		if (a.battery < b.battery){
 			return -1;
-		} else {
+			} else {
 			return 1
 		};
 	});
 	
 	dashboardDataLaptop = [...window.dashboardDataRecent].sort(function(a, b) {
 		const result = a.deviceID.localeCompare(b.deviceID);
-	
+		
 		if (result < 0) {
 			return -1;
-		} else if (result > 0) {
+			} else if (result > 0) {
 			return 1;
-		} else {
+			} else {
 			return 0;
 		}
 	});
@@ -37,15 +37,15 @@ async function dashboardDataUpdate(){
 		if (document.getElementById("cardsSearch").value === ''){
 			if (selectedSort === 'Most Recent'){
 				renderCards(dashboardDataRecent);
-			} else if (selectedSort === "Lowest Battery%"){
+				} else if (selectedSort === "Lowest Battery%"){
 				renderCards(dashboardDataBattery);
-			} else if (selectedSort === "Laptop Number"){
+				} else if (selectedSort === "Laptop Number"){
 				renderCards(dashboardDataLaptop);
 			}
-		} else {
+			} else {
 			console.log('canceled dashboard update, searchbar has content');
 		};
-	} catch (error) {
+		} catch (error) {
 		console.error(`Dashboard Fetch Error: ${error}`)
 	};
 };
@@ -79,7 +79,7 @@ function cardElement(laptopID, userName, batteryPercentage, time, active, arrayP
 	let batteryWarningTooltip = '';
 	
 	if (batteryPercentage < 41){
-		batteryWarningIcon = '<img src="/assets/icons/batteryLow.svg" height=40 class="batteryWarningIcon">';
+		batteryWarningIcon = '<img src="/assets/icons/batteryLow.svg" class="battery-alert" height=40 class="batteryWarningIcon">';
 		batteryWarningTooltip = 'data-tooltip="Low Battery"'
 	};
 	
@@ -93,7 +93,7 @@ function cardElement(laptopID, userName, batteryPercentage, time, active, arrayP
 		timeData = time.lastPing;
 	};
 	return `
-	<button class="laptopCard contrast${elementClass}" data-position="${arrayPos}" ${batteryWarningTooltip}><div>
+	<button class="laptopCard risingButton contrast${elementClass}" data-position="${arrayPos}" ${batteryWarningTooltip}><div>
 	<span class="laptopCardTitle">${batteryWarningIcon}LP - ${laptopID}</span>
 	<div class="truncate"> <img src="/assets/icons/user.svg" height=20> ${userName} </div>
 	<div> <img src="/assets/icons/battery${batteryIcon(batteryPercentage)}.svg" height=20> ${batteryPercentage}% </div>
@@ -104,7 +104,7 @@ function cardElement(laptopID, userName, batteryPercentage, time, active, arrayP
 
 function cardRow (cards){
 	return `
-	<div class="grid">
+	<div class="grid cardRow">
 	${cards.join('')}
 	</div>
 	`
@@ -148,11 +148,42 @@ function renderCards(list){
 		sessionTimerInterv = setInterval(updateUsageTime, 1000, usageTimeElement)
 	};
 };
+
+let battTableCount = 0;
+let battTableHtml = '';
+dashboardDataBattery.forEach(data => {
+
+	if (data.battery < 41){
+		console.log(data.deviceID);
+		
+		if (battTableCount % 4 === 0) {
+			battTableHtml += "<tr>";
+		};
+		
+		battTableHtml += `<td>LP - ${data.deviceID}</td>`;
+		battTableCount++;
+		
+		if (battTableCount % 4 === 0) {
+			battTableHtml += '</tr>';
+		};
+	};
+});
+if (battTableCount % 4 !== 0) {
+		battTableHtml += '</tr>';
+};
+document.getElementById('summaryTable').innerHTML = battTableHtml;
+
 //initial render
 renderCards(dashboardDataRecent);
 
 document.getElementById("cardsSearch").addEventListener('input', function(){
 	const tRows = document.querySelectorAll('button.laptopCard');
+	
+	if (this.value != ''){
+		document.getElementById("laptopSummary").classList.add('hide')
+	} else {
+		document.getElementById("laptopSummary").classList.remove('hide')
+	};
 	
 	tRows.forEach(row =>{
 		const rowText = row.textContent.toLowerCase();
@@ -251,7 +282,7 @@ function userHistoryTable(deviceId){
 	});
 	
 	const reloadTableSort = document.createElement('script');
-	reloadTableSort.src = '/js/table-sort.js';
+	reloadTableSort.src = '/js/deps/table-sort.js';
 	document.head.appendChild(reloadTableSort);
 };
 
@@ -269,45 +300,48 @@ document.getElementById("tableSearch").addEventListener('input', function(){
 	});
 });
 
+function showInfoModal(pos){
+	console.log(pos);
+	if (!modalElement.open){
+		const dbData = window.dashboardDataRecent[pos];
+		
+		document.getElementById("modalHeader").innerText = `LAPTOP ${dbData.deviceID}`;
+		
+		if (dbData.active){
+			document.getElementById("modalUserName").innerText = `Current User:`;
+			} else {
+			document.getElementById("modalUserName").innerText = `Last User:`;
+		};
+		document.getElementById("modalUser").innerText = `${dbData.user.firstName} ${dbData.user.lastName}`;
+		
+		document.getElementById("modalBatteryIcon").src = `/assets/icons/battery${batteryIcon(dbData.battery)}.svg`;
+		document.getElementById("modalBattery").innerText = `${dbData.battery}%`;
+		document.getElementById("modalWifi").innerText = `${dbData.wifi}`;
+		
+		if (dbData.active){
+			document.getElementById("modalTimeName").innerText = 'Usage Time:'
+			document.getElementById("modalTimeIcon").src = `/assets/icons/usageTime.svg`;
+			document.getElementById("modalTime").setAttribute('data-datetime', dbData.user.loginTime);
+			updateUsageTime(document.getElementById("modalTime"));
+			} else {
+			document.getElementById("modalTimeName").innerText = 'Logout Time:';
+			document.getElementById("modalTimeIcon").src = `/assets/icons/lastUsed.svg`;
+			document.getElementById("modalTime").setAttribute('data-datetime', dbData.lastPing);
+			formatLastUsed(document.getElementById("modalTime"));
+		};
+		
+		userHistoryTable(dbData.deviceID);
+		
+		document.documentElement.classList.add('modal-is-opening');
+		document.documentElement.classList.add('modal-is-open');
+		modalElement.showModal();
+		setTimeout(() => {document.documentElement.classList.remove('modal-is-opening');}, 400);
+	};
+};
+
 document.getElementById("laptopCards").addEventListener('click', (event) => {
 	if (event.target.closest(".laptopCard")) {
-		const pos = Number(event.target.closest(".laptopCard").getAttribute('data-position'))
-		
-		if (!modalElement.open){
-			const dbData = window.dashboardDataRecent[pos];
-			
-			document.getElementById("modalHeader").innerText = `LAPTOP ${dbData.deviceID}`;
-			
-			if (dbData.active){
-				document.getElementById("modalUserName").innerText = `Current User:`;
-				} else {
-				document.getElementById("modalUserName").innerText = `Last User:`;
-			};
-			document.getElementById("modalUser").innerText = `${dbData.user.firstName} ${dbData.user.lastName}`;
-			
-			document.getElementById("modalBatteryIcon").src = `/assets/icons/battery${batteryIcon(dbData.battery)}.svg`;
-			document.getElementById("modalBattery").innerText = `${dbData.battery}%`;
-			document.getElementById("modalWifi").innerText = `${dbData.wifi}`;
-			
-			if (dbData.active){
-				document.getElementById("modalTimeName").innerText = 'Usage Time:'
-				document.getElementById("modalTimeIcon").src = `/assets/icons/usageTime.svg`;
-				document.getElementById("modalTime").setAttribute('data-datetime', dbData.user.loginTime);
-				updateUsageTime(document.getElementById("modalTime"));
-				} else {
-				document.getElementById("modalTimeName").innerText = 'Logout Time:';
-				document.getElementById("modalTimeIcon").src = `/assets/icons/lastUsed.svg`;
-				document.getElementById("modalTime").setAttribute('data-datetime', dbData.lastPing);
-				formatLastUsed(document.getElementById("modalTime"));
-			};
-			
-			userHistoryTable(dbData.deviceID);
-			
-			document.documentElement.classList.add('modal-is-opening');
-			document.documentElement.classList.add('modal-is-open');
-			modalElement.showModal();
-			setTimeout(() => {document.documentElement.classList.remove('modal-is-opening');}, 400);
-		};
+		showInfoModal(Number(event.target.closest(".laptopCard").getAttribute('data-position')));
 	};
 });
 

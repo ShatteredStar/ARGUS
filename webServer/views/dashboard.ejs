@@ -3,8 +3,9 @@
 	<head>
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
-		<link rel="stylesheet" href="/styles/pico.blue.css">
+		<link rel="stylesheet" href="/styles/deps/pico.blue.css">
 		<link rel="stylesheet" href="/styles/dashboard.css">
+		<link rel="stylesheet" href="/styles/argus.css">
 		
 		
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,16 +14,21 @@
 	
 	<body>
 		
-		<div class="container">
-			
-		</div>
+		<nav class="container-fluid">
+			<ul>
+				<li><img class="logo" src="/assets/logo.svg"></li>
+			</ul>
+			<ul>
+				<a href="/create-qr"><button class="highlightButton">Create QR ID</button></a>
+			</ul>
+		</nav>
 		
 		<div class="container-fluid navSearch">
-			<img class="logo" src="/assets/logo.svg">
+			
 			<fieldset role="group">
 				<input type="search" autocomplete="off" id="cardsSearch"placeholder="Search laptops, battery percentages, or users...">
 				<details class="dropdown" id="sortDropdown">
-					<summary >Sort By: <i>Most Recent</i></summary>
+					<summary>Sort By: <i>Most Recent</i></summary>
 					<ul>
 						<li><a href="#">Laptop Number</a></li>
 						<li><a href="#">Lowest Battery%</a></li>
@@ -31,7 +37,23 @@
 			</fieldset>
 		</div>
 		
-		<div id="laptopCards" class="container" data-theme="dark">
+		<div id="laptopSummary" class="container-fluid grid">
+			
+			<article class="summaryCard">
+				<header>Monthly Users:</header>
+				<canvas id="activityChart" style="max-height: 180px;"></canvas>
+			</article>
+			
+			<article class="summaryCard" style="overflow-y: auto;">
+				<header>Low Battery Laptops</header>
+				<table>
+					<tbody id="summaryTable"></tbody>
+				</table>
+			</article>
+			
+		</div>
+		
+		<div id="laptopCards" class="container-fluid" data-theme="dark">
 		</div>
 		
 		<dialog id="deviceInfoModal">
@@ -40,7 +62,7 @@
 					<button aria-label="Close" rel="prev"></button>
 					<h3 id="modalHeader">LAPTOP 111</h3>
 				</header>
-				<table>
+				<table class="striped">
 					<tbody>
 						<tr>
 							<th scope="row"> <img src="/assets/icons/user.svg" height=20> <span id="modalUserName"></span></th>
@@ -64,7 +86,7 @@
 				<details id="modalUserHistory">
 					<summary role="button" class="contrast">User History</summary>
 					<input type="search" autocomplete="off" id="tableSearch" placeholder="Search names, sections, or dates...">
-					<table class="table-sort table-arrows">
+					<table class="table-sort table-arrows striped">
 						<thead>
 							<tr>
 								<th scope="col">Login</th>
@@ -91,3 +113,5 @@
 	
 	
 <script src="/js/dashboard.js"></script>
+<script src="/js/deps/chart.js"></script>
+<script src="/js/graph.js"></script>

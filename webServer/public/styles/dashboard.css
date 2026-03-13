@@ -1,57 +1,50 @@
-@media (orientation: landscape) {
-	.portraitOnly {
-		display: none !important;
-	}
+@keyframes battery-pulse {
+    0% { 
+        filter: drop-shadow(0 0 2px #ff4d4d) 
+                drop-shadow(0 0 4px rgba(255, 77, 77, 0.4)); 
+    }
+    50% { 
+        /* Stacking the filters makes the center "burn" brighter */
+        filter: drop-shadow(0 0 3px #ff4d4d) 
+                drop-shadow(0 0 12px rgba(255, 77, 77, 1))
+                drop-shadow(0 0 20px rgba(255, 77, 77, 0.6)); 
+    }
+    100% { 
+        filter: drop-shadow(0 0 2px #ff4d4d) 
+                drop-shadow(0 0 4px rgba(255, 77, 77, 0.4)); 
+    }
 }
 
-@media (orientation: portrait) {
-	.landscapeOnly {
-		display: none !important;
-	}
+.battery-alert {
+    fill: #ff4d4d;
+	width: 1.2em; 
+    height: 1.2em;
+    display: inline-block;
+    vertical-align: middle;
+    animation: battery-pulse 2s infinite ease-in-out;
 }
 
-.hide{
-	display: none !important;
+article.summaryCard {
+	min-height: 180px;
+	max-height: 280px;
+	height: 40vh;
 }
 
-.truncate {
+.scanQrButtone {
+	border-radius: 24px;
+	font-size: 1rem;
+	font-weight: bold;
+	background-color: #a6a6a6;
+	color: white;
 	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	width: 100%; 
 }
 
-html {
-	background-image: url("../assets/bgBlurDark.png");
-	background-attachment: fixed;
-	background-size: cover;
-	background-repeat: no-repeat;
-	overflow-y: overlay;
-} 
 
-nav {
-	background-color: #eddfe0;
-	border-radius: 10px;
-	margin-right: 0.8rem;
-	margin-left: 0.8rem;
-	margin-top: 0.3rem;
-}
 
-.navTitle{
-	font-size: 1.5rem;
-	font-style: italic;
-}
-
-nav ul.links {
-	margin-right: 0.5rem;
-}
-
-nav ul.name {
-	margin-left: 0.5rem;
-}
 
 button.laptopCard{
 	text-align: left;
+	box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
 	/*color: black;*/
 }
 
@@ -71,13 +64,13 @@ span.laptopCardTitle{
 	font-weight: bold;
 }
 
-.grid {
+.cardRow{
 	margin-bottom: 1rem;
 	margin-top: 1rem;
 }
 
 #deviceInfoModal > article {
-	width: 60%;
+	width: 65%;
 	max-width: 1200px;
 }
 
@@ -87,35 +80,29 @@ span.laptopCardTitle{
 	margin: 0 auto;
 }
 
-.logo {
-	width: 15%;
-}
-
-.batteryWarningIcon{
-	height: 1.8rem;
-}
-
 /*too lazy to write ts myself, thank gemini*/
 
 /* Target the dropdown inside your group */
 [role="group"] details.dropdown {
-    width: auto;
-    white-space: nowrap; /* Prevents text and arrow from splitting */
+	width: auto;
+	white-space: nowrap; /* Prevents text and arrow from splitting */
     margin-bottom: 0;
 }
 
 [role="group"] details.dropdown summary {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem; /* Space between text and arrow */
-    height: 100%; /* Match height of search input */
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem; /* Space between text and arrow */
+	height: 100%; /* Match height of search input */
+	border-top-right-radius: 5rem;
+	border-bottom-right-radius: 5rem;
 }
 
 /* Fixes the arrow positioning specifically for Pico */
 [role="group"] details.dropdown summary::after {
-    margin-top: 0; 
-    position: static; /* Stops the arrow from floating to a new line */
+	margin-top: 0; 
+	position: static; /* Stops the arrow from floating to a new line */
 }
 
 /* 1. Define the width of the scrollbar */
