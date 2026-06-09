@@ -1,6 +1,11 @@
 loginClient/dist/
 loginClient/build/
+.venv/
 *.spec
+.python-version
+__pycache__/
+
+*.db-journal
 
 webserver/argus.db
 

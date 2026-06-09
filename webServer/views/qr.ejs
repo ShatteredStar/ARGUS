@@ -1,95 +1,143 @@
 <!doctype html>
 <html lang="en" data-theme="white">
-	<head>
-		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
-		<link rel="stylesheet" href="/styles/deps/pico.slate.css">
-		<link rel="stylesheet" href="/styles/argus.css">
-		<link rel="stylesheet" href="/styles/qr.css">
-		
-		
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>ARGUS - Create QR</title>
-	</head>
-	
-	<body>
-		
-		<nav class="container-fluid">
-			<ul>
-				<li><img class="logo" src="/assets/logo.svg"></li>
-			</ul>
-			<ul>
-				<a href="/"><button class="highlightButton">Dashboard</button></a>
-			</ul>
-		</nav>
-		
-		<div class="container">
-			<article>
-				<header>Create QR Identifier</header>
-				
-				<div class="grid">
-					<form  autocomplete="off" id="qrForm">
-						<label for="firstnameInput">First Name</label>
-						<input type="text" name="text"
-						oninput="this.value = this.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')"
-						onfocus="this.select()"
-						id="firstnameInput"
-						placeholder="(e.g., Juan)"
-						required>
-						
-						<label for="surnameInput">Surname</label>
-						<input type="text" name="text"
-						oninput="this.value = this.value.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ')"
-						onfocus="this.select()"
-						id="surnameInput"
-						placeholder="(e.g., Dela Cruz)"
-						required>
-						
-						<label for="strandSectionInput">Strand & Section</label>
-						<fieldset role="group" id="strandSectionInput">
-							<input type="text" name="text" 
-							id="strandInput"
-							oninput="this.value = this.value.toUpperCase()"
-							onfocus="this.select()"
-							placeholder="(e.g., STEM)"
-							required>
-							<input type="number" name="number"
-							min="1" max="12"
-							onfocus="this.select()"
-							id="sectionInput"
-							placeholder="(e.g., 1)"
-							required>
-						</fieldset>
-						
-						<label for="gradInput">Graduation Year:</label>
-						<input 
-						type="number" name="number"
-						min="2026" max="2036" 
-						onfocus="this.select()"
-						id="gradInput" 
-						placeholder="(e.g., 2026)"
-						required>
-						
-						<input type="submit" value="Create">
-					</form>
-					
-					
-					<div class="qrSection">
-						<center><div id="canvas"><img src="/assets/icons/qr.svg" width=300></div></center>
-						
-						<div class="grid qrButtons">
-							<button id="copyButton" class="outline" disabled><img src="/assets/icons/copy.svg" height=20>Copy</button>
-							<button id="downloadButton" class="outline" disabled><img src="/assets/icons/download.svg" height=20>Download</button>
-						</div>
-					</div>
-				</div>
-				
-			</article>
-		</div>
-		
-		
-	</body>
-	
-	
-	<script src="/js/deps/qr-code-styling.js"></script>
-<script src="/js/create-qr.js"></script>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+        <link rel="stylesheet" href="/styles/deps/pico.slate.css" />
+        <link rel="stylesheet" href="/styles/argus.css" />
+        <link rel="stylesheet" href="/styles/qr.css" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>ARGUS - Create QR</title>
+    </head>
+
+    <body>
+        <nav class="container-fluid">
+            <ul>
+                <li><img class="logo" src="/assets/logo.svg" /></li>
+            </ul>
+            <ul>
+                <a href="/"
+                    ><button class="highlightButton">Dashboard</button></a
+                >
+            </ul>
+        </nav>
+
+        <div class="container">
+            <article>
+                <header>Create QR Identifier</header>
+
+                <div class="grid">
+                    <form autocomplete="off" id="qrForm">
+                        <label for="firstnameInput">First Name</label>
+                        <input
+                            type="text"
+                            name="text"
+                            oninput="
+                                this.value = this.value
+                                    .split(' ')
+                                    .map(
+                                        (w) =>
+                                            w.charAt(0).toUpperCase() +
+                                            w.slice(1).toLowerCase(),
+                                    )
+                                    .join(' ')
+                            "
+                            onfocus="this.select()"
+                            id="firstnameInput"
+                            placeholder="(e.g., Juan)"
+                            required
+                        />
+
+                        <label for="surnameInput">Surname</label>
+                        <input
+                            type="text"
+                            name="text"
+                            oninput="
+                                this.value = this.value
+                                    .split(' ')
+                                    .map(
+                                        (w) =>
+                                            w.charAt(0).toUpperCase() +
+                                            w.slice(1).toLowerCase(),
+                                    )
+                                    .join(' ')
+                            "
+                            onfocus="this.select()"
+                            id="surnameInput"
+                            placeholder="(e.g., Dela Cruz)"
+                            required
+                        />
+
+                        <label for="strandSectionInput">Strand & Section</label>
+                        <fieldset role="group" id="strandSectionInput">
+                            <input
+                                type="text"
+                                name="text"
+                                id="strandInput"
+                                oninput="this.value = this.value.toUpperCase()"
+                                onfocus="this.select()"
+                                placeholder="(e.g., STEM)"
+                                required
+                            />
+                            <input
+                                type="number"
+                                name="number"
+                                min="1"
+                                max="12"
+                                onfocus="this.select()"
+                                id="sectionInput"
+                                placeholder="(e.g., 1)"
+                                required
+                            />
+                        </fieldset>
+
+                        <label for="gradInput">Graduation Year:</label>
+                        <input
+                            type="number"
+                            name="number"
+                            min="2026"
+                            max="2036"
+                            onfocus="this.select()"
+                            id="gradInput"
+                            placeholder="(e.g., 2026)"
+                            required
+                        />
+
+                        <input type="submit" value="Create" />
+                    </form>
+
+                    <div class="qrSection">
+                        <center>
+                            <div id="canvas">
+                                <img src="/assets/icons/qr.svg" width="300" />
+                            </div>
+                        </center>
+
+                        <div class="grid qrButtons">
+                            <button id="copyButton" class="outline" disabled>
+                                <img
+                                    src="/assets/icons/copy.svg"
+                                    height="20"
+                                />Copy
+                            </button>
+                            <button
+                                id="downloadButton"
+                                class="outline"
+                                disabled
+                            >
+                                <img
+                                    src="/assets/icons/download.svg"
+                                    height="20"
+                                />Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+    </body>
+
+    <script src="/js/deps/qr-code-styling.js"></script>
+    <script src="/js/create-qr.js"></script>
+</html>

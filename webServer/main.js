@@ -32,9 +32,9 @@ const lockSQL = `
 `;
 
 const dashboardSQL = `
-SELECT 
-    d.deviceID, 
-    d.battery, 
+SELECT
+    d.deviceID,
+    d.battery,
     d.lastPing,
 	d.wifi,
     u.firstName,
@@ -42,8 +42,8 @@ SELECT
     u.loginTime
 FROM devices d
 LEFT JOIN users u ON u.rowid = (
-    SELECT rowid FROM users 
-    WHERE deviceID = d.deviceID 
+    SELECT rowid FROM users
+    WHERE deviceID = d.deviceID
     ORDER BY loginTime DESC
 )
 ORDER BY u.loginTime DESC;
@@ -84,14 +84,14 @@ function getUserHistory(){
 	return new Promise((resolve, reject) => {
 		argusDB.all(userHistorySQL, [], (err, rows) => {
 			if (err) return reject (err);
-			
+
 			userHistoryData = {};
-			
+
 			rows.forEach(row =>{
 				if (!userHistoryData[row.deviceID]){
 					userHistoryData[row.deviceID] = [];
 				};
-				
+
 				userHistoryData[row.deviceID].push({
 					firstName: row.firstName,
 					lastName: row.lastName,
@@ -101,7 +101,7 @@ function getUserHistory(){
 					loginTime: row.loginTime
 				})
 			})
-			
+
 			resolve(userHistoryData);
 		})
 	});
@@ -112,12 +112,12 @@ function getDashboard(){
 		argusDB.all(dashboardSQL, [], (err, rows) => {
 			const dashboardData = [];
 			const dashboardUsers = [];
-		
+
 			rows.forEach(row => {
 				const lastPingDate = new Date(row.lastPing.replace(' ', 'T'));
 				const now = new Date();
 				const isActive = (now -lastPingDate) < (1*(10*1000)); //10 second delay before being marked inactive
-				
+
 				dashboardData.push({
 					deviceID: row.deviceID,
 					battery: row.battery,
@@ -144,7 +144,7 @@ argus.post('/api/device', (req, res) => {
 	console.log('DEVICE DATA RECEIVED');
 	console.log(req.body);
 	res.sendStatus(200);
-	
+
 	watchdogStore(req.body);
 });
 
@@ -152,7 +152,7 @@ argus.post('/api/user', (req, res) => {
 	console.log('USER DATA RECEIVED');
 	console.log(req.body);
 	res.sendStatus(200);
-	
+
 	lockStore(req.body);
 });
 
@@ -180,4 +180,4 @@ argus.get('/', async (req, res) => {
 
 //argus.listen(port, () => {console.log(`ARGUS listening on port ${port}`)});
 
-argus.listen(3000, '0.0.0.0', () => {console.log("Server is live on the local network!")});
+argus.listen(port, '0.0.0.0', () => {console.log(`Server is live on the local network with port ${port}`)});

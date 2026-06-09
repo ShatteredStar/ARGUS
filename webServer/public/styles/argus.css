@@ -1,3 +1,8 @@
+/* @view-transition {
+  navigation: auto;
+} */
+
+
 @media (orientation: landscape) {
 	.portraitOnly {
 		display: none !important;
