@@ -1,0 +1,14 @@
+[project]
+name = "ARGUS"
+version = "0.1.0"
+description = "A Laptop Monitoring System made for a school ICT labs"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "customtkinter>=5.2.2",
+    "opencv-python>=4.13.0.92",
+    "pillow>=12.2.0",
+    "psutil>=7.2.2",
+    "qreader>=3.16",
+    "requests>=2.34.2",
+]

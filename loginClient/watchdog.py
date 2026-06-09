@@ -10,6 +10,8 @@ import sys
 # sys.argv[2] is the device id
 # sys.argv[3] is devMode activation
 
+
+
 try:
     sys.argv[1]
 except:
@@ -24,13 +26,13 @@ def getWifi():
             creationflags=subprocess.CREATE_NO_WINDOW,
             stderr=subprocess.STDOUT # Capture error messages too
         ).decode('utf-8')
-        
+
         for line in output.strip().split('\n'):
             if "SSID" in line and "BSSID" not in line:
                 return line.split(':')[1].strip()
-        
+
         return "Not connected through Wi-Fi" # No SSID found even if command worked
-        
+
     except subprocess.CalledProcessError:
         # This happens if Wi-Fi is off or still connecting
         return "Wi-Fi is off"
@@ -62,7 +64,7 @@ print(lockPath)
 
 while True:
     # lockAlive = False
-    
+
     # try:
         # if len(sys.argv) > 3 and sys.argv[3] == 'devMode':
             # print('devmode active, wont run Lock')
@@ -78,7 +80,7 @@ while True:
                 # break # Exit the for-loop immediately
         # if not lockAlive:
             # subprocess.Popen(
-                # [lockPath, sys.argv[1], sys.argv[2]], 
+                # [lockPath, sys.argv[1], sys.argv[2]],
                 # #creationflags=flags,
                 # #shell=True,
                 # close_fds=True
