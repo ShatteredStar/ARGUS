@@ -1,19 +1,37 @@
-const express = require('express');
-const sqlite = require('sqlite3');
+const express = require("express");
+const session = require("express-session");
+const sqlite = require("sqlite3");
+require('dotenv').config();
 
 const argus = express();
 const port = 3000;
 
-argus.use(express.static('public'));
-argus.set('view engine', 'ejs');
+argus.use(express.static("public"));
+argus.set("view engine", "ejs");
+argus.use(express.json());
+argus.use(
+	session({
+		secret: "ArgusQrKey2026",
+		resave: false,
+		saveUninitialized: false,
+	}),
+);
+
+function requireAuth(req, res, next) {
+	if (req.session && req.session.isAdmin) {
+		next();
+	} else {
+		res.redirect("/login");
+	}
+}
 
 /*database stuff*/
 
-let argusDB = new sqlite.Database('./argus.db', (err) => {
+let argusDB = new sqlite.Database("./argus.db", (err) => {
 	if (err) {
 		console.error(err.message);
 	}
-	console.log('loaded sqlite db');
+	console.log("loaded sqlite db");
 });
 
 const watchdogSQL = `
@@ -49,7 +67,7 @@ LEFT JOIN users u ON u.rowid = (
 ORDER BY u.loginTime DESC;
 `;
 
-const userHistorySQL= `
+const userHistorySQL = `
 SELECT
 	u.firstName,
 	u.lastName,
@@ -60,37 +78,63 @@ SELECT
 	u.loginTime
 FROM users u
 ORDER BY u.loginTime DESC;
-`
+`;
 
-function watchdogStore(data){
-	argusDB.run(watchdogSQL, [data.deviceName, data.batteryPercentage, data.bootTime, data.wifi, data.lastPing], function(err) {
-		if (err) {
-			return console.error("SQLite Insert Error:", err.message);
-		}
-		console.log(`Success: Device ${data.deviceName} updated. Rows affected: ${this.changes}`);
-	});
-};
+function watchdogStore(data) {
+	argusDB.run(
+		watchdogSQL,
+		[
+			data.deviceName,
+			data.batteryPercentage,
+			data.bootTime,
+			data.wifi,
+			data.lastPing,
+		],
+		function (err) {
+			if (err) {
+				return console.error("SQLite Insert Error:", err.message);
+			}
+			console.log(
+				`Success: Device ${data.deviceName} updated. Rows affected: ${this.changes}`,
+			);
+		},
+	);
+}
 
-function lockStore(data){
-	argusDB.run(lockSQL, [data.firstName, data.lastName, data.grade, data.strand, data.section, data.deviceID, data.loginTime], function(err){
-		if (err) {
-			return console.error("SQLite Insert Error:", err.message);
-		}
-		console.log(`Success: User ${data.firstName} ${data.lastName} updated. Rows affected: ${this.changes}`);
-	});
-};
+function lockStore(data) {
+	argusDB.run(
+		lockSQL,
+		[
+			data.firstName,
+			data.lastName,
+			data.grade,
+			data.strand,
+			data.section,
+			data.deviceID,
+			data.loginTime,
+		],
+		function (err) {
+			if (err) {
+				return console.error("SQLite Insert Error:", err.message);
+			}
+			console.log(
+				`Success: User ${data.firstName} ${data.lastName} updated. Rows affected: ${this.changes}`,
+			);
+		},
+	);
+}
 
-function getUserHistory(){
+function getUserHistory() {
 	return new Promise((resolve, reject) => {
 		argusDB.all(userHistorySQL, [], (err, rows) => {
-			if (err) return reject (err);
+			if (err) return reject(err);
 
 			userHistoryData = {};
 
-			rows.forEach(row =>{
-				if (!userHistoryData[row.deviceID]){
+			rows.forEach((row) => {
+				if (!userHistoryData[row.deviceID]) {
 					userHistoryData[row.deviceID] = [];
-				};
+				}
 
 				userHistoryData[row.deviceID].push({
 					firstName: row.firstName,
@@ -98,25 +142,25 @@ function getUserHistory(){
 					grade: row.grade,
 					strand: row.strand,
 					section: row.section,
-					loginTime: row.loginTime
-				})
-			})
+					loginTime: row.loginTime,
+				});
+			});
 
 			resolve(userHistoryData);
-		})
+		});
 	});
-};
+}
 
-function getDashboard(){
+function getDashboard() {
 	return new Promise((resolve, reject) => {
 		argusDB.all(dashboardSQL, [], (err, rows) => {
 			const dashboardData = [];
 			const dashboardUsers = [];
 
-			rows.forEach(row => {
-				const lastPingDate = new Date(row.lastPing.replace(' ', 'T'));
+			rows.forEach((row) => {
+				const lastPingDate = new Date(row.lastPing.replace(" ", "T"));
 				const now = new Date();
-				const isActive = (now -lastPingDate) < (1*(10*1000)); //10 second delay before being marked inactive
+				const isActive = now - lastPingDate < 1 * (10 * 1000); //10 second delay before being marked inactive
 
 				dashboardData.push({
 					deviceID: row.deviceID,
@@ -127,57 +171,78 @@ function getDashboard(){
 					user: {
 						firstName: row.firstName,
 						lastName: row.lastName,
-						loginTime: row.loginTime
-					}
+						loginTime: row.loginTime,
+					},
 				});
 			});
 			resolve(dashboardData);
 		});
 	});
-};
+}
 
 /*express stuff*/
 
-argus.use(express.json())
+argus.use(express.json());
 
-argus.post('/api/device', (req, res) => {
-	console.log('DEVICE DATA RECEIVED');
+argus.post("/api/device", (req, res) => {
+	console.log("DEVICE DATA RECEIVED");
 	console.log(req.body);
 	res.sendStatus(200);
 
 	watchdogStore(req.body);
 });
 
-argus.post('/api/user', (req, res) => {
-	console.log('USER DATA RECEIVED');
+argus.post("/api/user", (req, res) => {
+	console.log("USER DATA RECEIVED");
 	console.log(req.body);
 	res.sendStatus(200);
 
 	lockStore(req.body);
 });
 
-argus.get('/api/dashboard-update', async (req, res) => {
-	console.log('DASHBOARD UPDATE REQUESTED');
+argus.get("/api/dashboard-update", async (req, res) => {
+	console.log("DASHBOARD UPDATE REQUESTED");
 	const data = {
 		dashboardData: await getDashboard(),
-		userHistoryData: await getUserHistory()
+		userHistoryData: await getUserHistory(),
 	};
 	res.json(data);
 });
 
-argus.get('/create-qr', async (req, res) => {
-	console.log('qr ping');
-	res.render('qr', {});
+argus.get("/login", async (req, res) => {
+	console.log("login ping");
+	res.render("login", {});
 });
 
-argus.get('/', async (req, res) => {
-	console.log('dashboard ping');
-	res.render('dashboard', {
+argus.get("/create-qr", requireAuth, async (req, res) => {
+	console.log("qr ping");
+	res.render("qr", {});
+});
+
+argus.get("/", requireAuth, async (req, res) => {
+	console.log("dashboard ping");
+	res.render("dashboard", {
 		dashboardData: JSON.stringify(await getDashboard()),
-		userHistoryData: JSON.stringify(await getUserHistory())
+		userHistoryData: JSON.stringify(await getUserHistory()),
 	});
+});
+
+argus.post("/login", (req, res) => {
+	if (req.body.password === process.env.ADMIN_PASSWORD) {
+		req.session.isAdmin = true;
+		res.redirect("/");
+	} else {
+		res.status(401).json({ error: "Incorrect password" });
+	}
+});
+
+argus.get("/logout", (req, res) => {
+	req.session.destroy();
+	res.redirect("/login");
 });
 
 //argus.listen(port, () => {console.log(`ARGUS listening on port ${port}`)});
 
-argus.listen(port, '0.0.0.0', () => {console.log(`Server is live on the local network with port ${port}`)});
+argus.listen(port, "0.0.0.0", () => {
+	console.log(`Server is live on the local network with port ${port}`);
+});

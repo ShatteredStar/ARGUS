@@ -2,7 +2,6 @@
   navigation: auto;
 } */
 
-
 @media (orientation: landscape) {
 	.portraitOnly {
 		display: none !important;
@@ -16,7 +15,9 @@
 }
 
 .risingButton {
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	transition:
+		transform 0.2s ease,
+		box-shadow 0.2s ease;
 }
 
 .risingButton:hover {
@@ -24,10 +25,10 @@
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Adds depth */
 }
 
-/* From Uiverse.io by virus231 */ 
+/* From Uiverse.io by virus231 */
 .highlightButton {
 	/* background: #01274b; */
-	background: #EFF1F4;
+	background: #eff1f4;
 	border-radius: 5rem;
 	border: 2px solid transparent;
 
@@ -47,16 +48,15 @@
 	opacity: 80%;
 }
 
-.hide{
+.hide {
 	display: none !important;
 }
-
 
 .truncate {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	width: 100%; 
+	width: 100%;
 }
 
 html {
@@ -69,5 +69,52 @@ html {
 
 .logo {
 	width: 15%;
-	
+}
+
+.logo.login {
+	width: 25%;
+	margin: 0 auto;
+}
+
+header.login {
+	text-align: center;
+}
+
+article.login {
+	margin-right: 10%;
+	margin-left: 10%;
+}
+
+span.login {
+	font-size: 0.8rem;
+}
+
+@keyframes error {
+	0% {
+		transform: translateX(0);
+		box-shadow: 0 0 0px rgba(255, 0, 0, 0);
+	}
+	25% {
+		transform: translateX(-6px);
+		box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+	}
+	50% {
+		transform: translateX(6px);
+		box-shadow: 0 0 20px rgba(255, 0, 0, 1);
+	}
+	75% {
+		transform: translateX(-6px);
+		box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+	}
+	100% {
+		transform: translateX(0);
+		box-shadow: 0 0 0px rgba(255, 0, 0, 0);
+	}
+}
+
+.error {
+	animation: error 0.3s ease;
+}
+
+#loginPasswordSubmit {
 }

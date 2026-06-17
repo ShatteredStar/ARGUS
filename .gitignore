@@ -6,6 +6,7 @@ loginClient/build/
 __pycache__/
 
 *.db-journal
+*.env
 
 webserver/argus.db
 

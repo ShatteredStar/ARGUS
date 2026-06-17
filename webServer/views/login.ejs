@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" data-theme="white">
+	<head>
+		<meta charset="UTF-8" />
+		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
+		<link rel="stylesheet" href="/styles/deps/pico.slate.css" />
+		<link rel="stylesheet" href="/styles/argus.css" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ARGUS - Create QR</title>
+	</head>
+
+	<body>
+		<nav class="container-fluid">
+			<img class="logo login" src="/assets/logo.svg" />
+		</nav>
+
+		<div class="container">
+			<article class="login">
+				<header class="login">Login</header>
+				<fieldset>
+					<label
+						>User
+						<input placeholder="Admin" disabled />
+					</label>
+
+					<label>User
+						<input
+							type="password"
+							name="password"
+							id="loginPasswordInput"
+							placeholder="Password"
+						/>
+					</label>
+
+					<label>
+						<input type="checkbox" id="loginPasswordToggle">
+						<span class="login" id="loginPasswordText">Show Password<span/>
+					</label>
+				</fieldset>
+				<input data-tooltip="Top" type="submit" id="loginPasswordSubmit" value="Log In" />
+			</article>
+		</div>
+	</body>
+
+	<script src="/js/login.js"></script>
+</html>

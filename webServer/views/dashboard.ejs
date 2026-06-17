@@ -3,30 +3,34 @@
 	<head>
 		<meta charset="UTF-8" />
 		<link rel="icon" type="image/svg+xml" href="/assets/logo.svg" />
-		<link rel="stylesheet" href="/styles/deps/pico.blue.css">
-		<link rel="stylesheet" href="/styles/dashboard.css">
-		<link rel="stylesheet" href="/styles/argus.css">
-		
-		
+		<link rel="stylesheet" href="/styles/deps/pico.blue.css" />
+		<link rel="stylesheet" href="/styles/dashboard.css" />
+		<link rel="stylesheet" href="/styles/argus.css" />
+
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>ARGUS - Dashboard</title>
 	</head>
-	
+
 	<body>
-		
 		<nav class="container-fluid">
 			<ul>
-				<li><img class="logo" src="/assets/logo.svg"></li>
+				<li><img class="logo" src="/assets/logo.svg" /></li>
 			</ul>
 			<ul>
-				<a href="/create-qr"><button class="highlightButton">Create QR ID</button></a>
+				<a href="/create-qr"
+					><button class="highlightButton">Create QR ID</button></a
+				>
 			</ul>
 		</nav>
-		
+
 		<div class="container-fluid navSearch">
-			
 			<fieldset role="group">
-				<input type="search" autocomplete="off" id="cardsSearch"placeholder="Search laptops, battery percentages, or users...">
+				<input
+					type="search"
+					autocomplete="off"
+					id="cardsSearch"
+					placeholder="Search laptops, battery percentages, or users..."
+				/>
 				<details class="dropdown" id="sortDropdown">
 					<summary>Sort By: <i>Most Recent</i></summary>
 					<ul>
@@ -36,26 +40,23 @@
 				</details>
 			</fieldset>
 		</div>
-		
+
 		<div id="laptopSummary" class="container-fluid grid">
-			
 			<article class="summaryCard">
 				<header>Monthly Users:</header>
-				<canvas id="activityChart" style="max-height: 180px;"></canvas>
+				<canvas id="activityChart" style="max-height: 180px"></canvas>
 			</article>
-			
-			<article class="summaryCard" style="overflow-y: auto;">
+
+			<article class="summaryCard" style="overflow-y: auto">
 				<header>Low Battery Laptops</header>
 				<table>
 					<tbody id="summaryTable"></tbody>
 				</table>
 			</article>
-			
 		</div>
-		
-		<div id="laptopCards" class="container-fluid" data-theme="dark">
-		</div>
-		
+
+		<div id="laptopCards" class="container-fluid" data-theme="dark"></div>
+
 		<dialog id="deviceInfoModal">
 			<article>
 				<header>
@@ -65,27 +66,46 @@
 				<table class="striped">
 					<tbody>
 						<tr>
-							<th scope="row"> <img src="/assets/icons/user.svg" height=20> <span id="modalUserName"></span></th>
+							<th scope="row">
+								<img src="/assets/icons/user.svg" height="20" />
+								<span id="modalUserName"></span>
+							</th>
 							<td id="modalUser"></td>
 						</tr>
 						<tr>
-							<th scope="row"> <img id="modalBatteryIcon" height=20> Battery Percentage</th>
+							<th scope="row">
+								<img id="modalBatteryIcon" height="20" />
+								Battery Percentage
+							</th>
 							<td id="modalBattery"></td>
 						</tr>
 						<tr>
-							<th scope="row"><img id="modalTimeIcon"> <span id="modalTimeName"></span></th>
+							<th scope="row">
+								<img id="modalTimeIcon" />
+								<span id="modalTimeName"></span>
+							</th>
 							<td id="modalTime"></td>
 						</tr>
 						<tr>
-							<th scope="row"> <img src="/assets/icons/wifi.svg"> Wi-Fi Connection:</th>
+							<th scope="row">
+								<img src="/assets/icons/wifi.svg" /> Wi-Fi
+								Connection:
+							</th>
 							<td id="modalWifi"></td>
 						</tr>
 					</tbody>
 				</table>
-				
+
 				<details id="modalUserHistory">
-					<summary role="button" class="contrast">User History</summary>
-					<input type="search" autocomplete="off" id="tableSearch" placeholder="Search names, sections, or dates...">
+					<summary role="button" class="contrast">
+						User History
+					</summary>
+					<input
+						type="search"
+						autocomplete="off"
+						id="tableSearch"
+						placeholder="Search names, sections, or dates..."
+					/>
 					<table class="table-sort table-arrows striped">
 						<thead>
 							<tr>
@@ -95,23 +115,21 @@
 								<th scope="col">Section</th>
 							</tr>
 						</thead>
-						<tbody id="userHistoryInfo">
-						</tbody>
+						<tbody id="userHistoryInfo"></tbody>
 					</table>
 				</details>
 			</article>
 		</dialog>
-		
 	</body>
-	
+
 	<script>
 		window.dashboardDataRecent = JSON.parse(`<%- dashboardData %>`);
 		window.userHistoryData = JSON.parse(`<%- userHistoryData %>`);
 		console.log(window.dashboardDataRecent);
 		console.log(window.userHistoryData);
 	</script>
-	
-	
-<script src="/js/dashboard.js"></script>
-<script src="/js/deps/chart.js"></script>
-<script src="/js/graph.js"></script>
+
+	<script src="/js/dashboard.js"></script>
+	<script src="/js/deps/chart.js"></script>
+	<script src="/js/graph.js"></script>
+</html>
