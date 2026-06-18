@@ -69,28 +69,12 @@
 							required
 						/>
 
-						<label for="strandSectionInput">Strand & Section</label>
-						<fieldset role="group" id="strandSectionInput">
-							<input
-								type="text"
-								name="text"
-								id="strandInput"
-								oninput="this.value = this.value.toUpperCase()"
-								onfocus="this.select()"
-								placeholder="(e.g., STEM)"
-								required
-							/>
-							<input
-								type="number"
-								name="number"
-								min="1"
-								max="12"
-								onfocus="this.select()"
-								id="sectionInput"
-								placeholder="(e.g., 1)"
-								required
-							/>
-						</fieldset>
+						<label for="sectionInput">Strand & Section</label>
+						<select id="sectionInput" aria-label="(e.g., STEM 1)" required>
+							<option selected disabled value="">
+								(e.g., STEM 1)
+							</option>
+						</select>
 
 						<label for="gradInput">Graduation Year:</label>
 						<input
@@ -137,6 +121,10 @@
 			</article>
 		</div>
 	</body>
+
+	<script>
+		window.sectionsConfig = JSON.parse(`<%- config %>`);
+	</script>
 
 	<script src="/js/deps/qr-code-styling.js"></script>
 	<script src="/js/create-qr.js"></script>

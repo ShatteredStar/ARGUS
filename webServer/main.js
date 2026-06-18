@@ -1,7 +1,11 @@
 const express = require("express");
 const session = require("express-session");
 const sqlite = require("sqlite3");
-require('dotenv').config();
+const crypto = require("crypto");
+const fs = require("fs");
+const path = require("path");
+
+require("dotenv").config();
 
 const argus = express();
 const port = 3000;
@@ -11,7 +15,7 @@ argus.set("view engine", "ejs");
 argus.use(express.json());
 argus.use(
 	session({
-		secret: "ArgusQrKey2026",
+		secret: process.env.PASSWORD_SECRET,
 		resave: false,
 		saveUninitialized: false,
 	}),
@@ -30,8 +34,45 @@ function requireAuth(req, res, next) {
 let argusDB = new sqlite.Database("./argus.db", (err) => {
 	if (err) {
 		console.error(err.message);
+		return;
 	}
 	console.log("loaded sqlite db");
+
+	argusDB.run(
+		`CREATE TABLE IF NOT EXISTS devices (
+		deviceID TEXT PRIMARY KEY,
+		battery INTEGER,
+		bootTime TEXT,
+		wifi TEXT,
+		lastPing TEXT
+	)`,
+		(err) => {
+			if (err) {
+				console.error("Error creating devices table:", err.message);
+			} else {
+				console.log("devices table ready");
+			}
+		},
+	);
+
+	argusDB.run(
+		`CREATE TABLE IF NOT EXISTS users (
+		firstName TEXT,
+		lastName TEXT,
+		grade TEXT,
+		strand TEXT,
+		section TEXT,
+		deviceID TEXT,
+		loginTime TEXT
+	)`,
+		(err) => {
+			if (err) {
+				console.error("Error creating users table:", err.message);
+			} else {
+				console.log("users table ready");
+			}
+		},
+	);
 });
 
 const watchdogSQL = `
@@ -180,6 +221,12 @@ function getDashboard() {
 	});
 }
 
+function getConfig() {
+	const configPath = path.join(__dirname, "config.json");
+	const configFile = fs.readFileSync(configPath, "utf-8");
+	return JSON.parse(configFile);
+}
+
 /*express stuff*/
 
 argus.use(express.json());
@@ -200,6 +247,20 @@ argus.post("/api/user", (req, res) => {
 	lockStore(req.body);
 });
 
+argus.post("/api/sign-qr", (req, res) => {
+	console.log("SIGNING QR");
+
+	const hmac = crypto.createHmac("sha256", process.env.HMACSIG_KEY);
+
+	hmac.update(req.body.qrData);
+	const digest = hmac.digest("hex");
+
+	console.log(`Value: ${req.body.qrData}`);
+	console.log(`Signed: ${digest}`);
+
+	res.status(200).send(digest);
+});
+
 argus.get("/api/dashboard-update", async (req, res) => {
 	console.log("DASHBOARD UPDATE REQUESTED");
 	const data = {
@@ -216,7 +277,9 @@ argus.get("/login", async (req, res) => {
 
 argus.get("/create-qr", requireAuth, async (req, res) => {
 	console.log("qr ping");
-	res.render("qr", {});
+	res.render("qr", {
+		config: JSON.stringify(await getConfig()),
+	});
 });
 
 argus.get("/", requireAuth, async (req, res) => {
