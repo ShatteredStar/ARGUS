@@ -32,6 +32,7 @@ async function dashboardDataUpdate() {
 		const response = await fetch("/api/dashboard-update");
 		const responseJson = await response.json();
 		window.dashboardDataRecent = responseJson.dashboardData;
+		window.userHistoryData = responseJson.userHistoryData;
 		sortDashboardData();
 		console.log("request sent");
 
